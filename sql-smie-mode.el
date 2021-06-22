@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'smie)
+(require 'cl)
 
 (defvar sql-smie-indent-basic 4
   "Offset for SQL indentation.")
@@ -83,7 +84,7 @@
     ))
 
 (defun sql-smie-match-group ()
-  (/ (position-if-not 'null (cddr (match-data))) 2))
+  (/ (cl-position-if-not 'null (cddr (match-data))) 2))
 
 (defun sql-smie-forward-token ()
   (forward-comment (point-max))
