@@ -15,10 +15,14 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
+;; Updated and slightly modified by Kristoffer Grönlund.
+
 ;;; Code:
 
 (require 'smie)
-(require 'cl)
+(require 'cl-lib)
 
 (defvar sql-smie-indent-basic 4
   "Offset for SQL indentation.")
@@ -71,7 +75,8 @@
     '((assoc "OR") (assoc "AND")))))
 
 (defun sql-smie-rules (kind token)
-  (case kind
+  "KIND is after or before. Return rule based on TOKEN."
+  (cl-case kind
     (:after
      (cond
       ((equal token ",") (smie-rule-separator kind))
@@ -84,9 +89,11 @@
     ))
 
 (defun sql-smie-match-group ()
+  "Match group."
   (/ (cl-position-if-not 'null (cddr (match-data))) 2))
 
 (defun sql-smie-forward-token ()
+  "Return next token."
   (forward-comment (point-max))
   (cond
    ((looking-at sql-smie-token-regexp)
@@ -101,6 +108,7 @@
               (point))))))
 
 (defun sql-smie-backward-token ()
+  "Return previous token."
   (forward-comment (- (point)))
   (cond
    ((looking-back sql-smie-token-regexp (- (point) 20) t)
@@ -116,7 +124,7 @@
 
 (define-minor-mode sql-smie-mode
   "SMIE-based indentation for SQL mode."
-  nil nil nil nil
+  :lighter nil
   (modify-syntax-entry ?. "_")
   (smie-setup sql-smie-grammar #'sql-smie-rules
               :forward-token #'sql-smie-forward-token
